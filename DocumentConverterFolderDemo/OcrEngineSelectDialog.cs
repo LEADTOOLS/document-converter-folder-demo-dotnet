@@ -1,5 +1,5 @@
 ﻿// *************************************************************
-// Copyright (c) 1991-2019 LEAD Technologies, Inc.              
+// Copyright (c) 1991-2020 LEAD Technologies, Inc.              
 // All Rights Reserved.                                         
 // *************************************************************
 using System;
@@ -89,14 +89,15 @@ namespace Leadtools.Demos
       {
          if(!DesignMode)
          {
+            var version = Leadtools.Demos.DemosGlobal.LTVersion;
             // Check what OCR engines are installed using the registry
-            var engineProperties = new List<EngineProperty>();
+             var engineProperties = new List<EngineProperty>();
             engineProperties.Add(new EngineProperty
             {
                Name = "LEADTOOLS - LEAD OCR Engine",
                EngineType = OcrEngineType.LEAD,
                RuntimePath = @"LEADTOOLS\OcrLEADRuntime",
-               RegistryKeyName = "OCRPathLEAD20"
+               RegistryKeyName = string.Format("OCRPathLEAD{0}", version)
             });
 #if !LT_CLICKONCE && !FOR_NUGET
             if (IntPtr.Size == 8)
@@ -106,14 +107,14 @@ namespace Leadtools.Demos
                   Name = "LEADTOOLS - OmniPage OCR Engine",
                   EngineType = OcrEngineType.OmniPage,
                   RuntimePath = @"LEADTOOLS\OCROmniPageRuntime64",
-                  RegistryKeyName = "OCRPathOmniPage20_64"
+                  RegistryKeyName = string.Format("OCRPathOmniPage{0}_64", version)
                });
                engineProperties.Add(new EngineProperty
                {
                   Name = "LEADTOOLS - OmniPage Arabic OCR Engine",
                   EngineType = OcrEngineType.OmniPageArabic,
                   RuntimePath = @"LEADTOOLS\OCROmniPageArabicRuntime64",
-                  RegistryKeyName = "OCRPathOmniPageArabic20_64"
+                  RegistryKeyName = string.Format("OCRPathOmniPageArabic{0}_64", version)
                });
             }
             else
@@ -123,14 +124,14 @@ namespace Leadtools.Demos
                   Name = "LEADTOOLS - OmniPage OCR Engine",
                   EngineType = OcrEngineType.OmniPage,
                   RuntimePath = @"LEADTOOLS\OCROmniPageRuntime",
-                  RegistryKeyName = "OCRPathOmniPage20"
+                  RegistryKeyName = string.Format("OCRPathOmniPage{0}", version)
                });
                engineProperties.Add(new EngineProperty
                {
                   Name = "LEADTOOLS - OmniPage Arabic OCR Engine",
                   EngineType = OcrEngineType.OmniPageArabic,
                   RuntimePath = @"LEADTOOLS\OCROmniPageArabicRuntime",
-                  RegistryKeyName = "OCRPathOmniPageArabic20"
+                  RegistryKeyName = string.Format("OCRPathOmniPageArabic{0}", version)
                });
             }
 #endif // #if !LT_CLICKONCE && !FOR_NUGET
@@ -299,7 +300,11 @@ namespace Leadtools.Demos
 
             try
             {
+#if LEADTOOLS_V21_OR_LATER
+               ocrEngine = OcrEngineManager.CreateEngine(_engineProperty.EngineType);
+#else
                ocrEngine = OcrEngineManager.CreateEngine(_engineProperty.EngineType, false);
+#endif // #if LEADTOOLS_V21_OR_LATER
 
 #if LT_CLICKONCE
                ocrEngine.Startup( _rasterCodecsInstance, null, null, Application.StartupPath + @"\OCR Engine" );
